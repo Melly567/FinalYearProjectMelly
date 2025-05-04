@@ -1,0 +1,112 @@
+{% extends 'myapp/base.html' %}
+
+{% block title %}Prediction Results - Online Shopper Predictor{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card shadow mb-4">
+            <div class="card-body">
+                <h2 class="card-title mb-4">Prediction Results</h2>
+                
+                <div class="alert {% if prediction %}alert-success{% else %}alert-warning{% endif %} text-center mb-4">
+                    <h3>
+                        {% if prediction %}
+                            The shopper is likely to make a purchase! 🎉
+                        {% else %}
+                            The shopper is not likely to make a purchase.
+                        {% endif %}
+                    </h3>
+                </div>
+                
+                <h5 class="mt-4">Input Features:</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Feature</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Administrative Pages</td>
+                                <td>{{ features.Administrative }}</td>
+                            </tr>
+                            <tr>
+                                <td>Administrative Duration</td>
+                                <td>{{ features.Administrative_Duration }} seconds</td>
+                            </tr>
+                            <tr>
+                                <td>Informational Pages</td>
+                                <td>{{ features.Informational }}</td>
+                            </tr>
+                            <tr>
+                                <td>Informational Duration</td>
+                                <td>{{ features.Informational_Duration }} seconds</td>
+                            </tr>
+                            <tr>
+                                <td>Product Related Pages</td>
+                                <td>{{ features.ProductRelated }}</td>
+                            </tr>
+                            <tr>
+                                <td>Product Related Duration</td>
+                                <td>{{ features.ProductRelated_Duration }} seconds</td>
+                            </tr>
+                            <tr>
+                                <td>Bounce Rate</td>
+                                <td>{{ features.BounceRates }}</td>
+                            </tr>
+                            <tr>
+                                <td>Exit Rate</td>
+                                <td>{{ features.ExitRates }}</td>
+                            </tr>
+                            <tr>
+                                <td>Page Values</td>
+                                <td>{{ features.PageValues }}</td>
+                            </tr>
+                            <tr>
+                                <td>Special Day</td>
+                                <td>{{ features.SpecialDay }}</td>
+                            </tr>
+                            <tr>
+                                <td>Month</td>
+                                <td>{{ features.Month }}</td>
+                            </tr>
+                            <tr>
+                                <td>Weekend</td>
+                                <td>{% if features.Weekend %}Yes{% else %}No{% endif %}</td>
+                            </tr>
+                            <tr>
+                                <td>Operating System</td>
+                                <td>{{ features.OperatingSystems }}</td>
+                            </tr>
+                            <tr>
+                                <td>Browser</td>
+                                <td>{{ features.Browser }}</td>
+                            </tr>
+                            <tr>
+                                <td>Region</td>
+                                <td>{{ features.Region }}</td>
+                            </tr>
+                            <tr>
+                                <td>Traffic Type</td>
+                                <td>{{ features.TrafficType }}</td>
+                            </tr>
+                            <tr>
+                                <td>Visitor Type</td>
+                                <td>{{ features.VisitorType }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
+                    <a href="{% url 'predict' %}" class="btn btn-outline-primary me-md-2">Make Another Prediction</a>
+                    <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">View Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
