@@ -1,0 +1,256 @@
+{% extends 'myapp/base.html' %}
+
+{% block title %}Dashboard - Online Shopper Prediction{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <div class="card shadow mb-4">
+            <div class="card-body">
+                <h2 class="card-title mb-4">Dashboard</h2>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card text-white bg-primary mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Predictions</h5>
+                                <p class="card-text display-6">{{ stats.total_predictions|default:"0" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card text-white bg-success mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">Purchase Rate</h5>
+                                <p class="card-text display-6">{{ stats.purchase_rate|floatformat:1|default:"0.0" }}%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-12 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                Predictions Over Time
+                            </div>
+                            <div class="card-body">
+                                <canvas id="predictionsChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                Prediction Outcomes
+                            </div>
+                            <div class="card-body">
+                                <canvas id="outcomesPieChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                Model Performance
+                            </div>
+                            <div class="card-body">
+                                <canvas id="metricsChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-12 text-center">
+                        <a href="{% url 'train' %}" class="btn btn-outline-primary">Retrain Model</a>
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h4>Tools</h4>
+                                <div class="d-grid gap-2 d-md-flex">
+                                    <a href="{% url 'export_predictions' %}" class="btn btn-outline-success">
+                                        <i class="bi bi-file-earmark-excel"></i> Export Predictions to CSV
+                                    </a>
+                                    <a href="{% url 'bulk_predict' %}" class="btn btn-outline-primary">
+                                        <i class="bi bi-upload"></i> Bulk Prediction
+                                    </a>
+                                    <a href="{% url 'load_examples' %}" class="btn btn-outline-secondary">
+                                        <i class="bi bi-database"></i> Load Example Data
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        API Access
+                                    </div>
+                                    <div class="card-body">
+                                        <p>You can also make predictions via our API endpoint:</p>
+                                        <code>POST /api/predict/</code>
+                                        <p class="mt-2">Example Request:</p>
+                                        <pre class="bg-light p-3">
+                        {
+                          "administrative": 5,
+                          "administrative_duration": 120.5,
+                          "informational": 2,
+                          "informational_duration": 85.3,
+                          "product_related": 42,
+                          "product_related_duration": 1200.4,
+                          "bounce_rate": 0.02,
+                          "exit_rate": 0.04,
+                          "page_value": 12.5,
+                          "special_day": 0.0,
+                          "month": "Feb",
+                          "operating_systems": 2,
+                          "browser": 1,
+                          "region": 3,
+                          "traffic_type": 2,
+                          "visitor_type": "Returning_Visitor",
+                          "weekend": true
+                        }</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden data for charts -->
+<div id="chart-data" style="display: none;"
+     data-dates="{{ stats.dates|default:'[]' }}"
+     data-counts="{{ stats.counts|default:'[]' }}"
+     data-purchase="{{ stats.purchase_count|default:'0' }}"
+     data-no-purchase="{{ stats.no_purchase_count|default:'0' }}"
+     data-auc="{{ metrics.auc_score|default:'0' }}"
+     data-precision="{{ metrics.precision_score|default:'0' }}"
+     data-recall="{{ metrics.recall_score|default:'0' }}"
+     data-f1="{{ metrics.f1_score|default:'0' }}">
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get chart contexts
+        const timeCtx = document.getElementById('predictionsChart').getContext('2d');
+        const outcomeCtx = document.getElementById('outcomesPieChart').getContext('2d');
+        const metricsCtx = document.getElementById('metricsChart').getContext('2d');
+        
+        // Get data from hidden element
+        const chartData = document.getElementById('chart-data');
+        
+        // Parse dates and counts
+        let dates = ["No Data"];
+        let counts = [0];
+        try {
+            const datesRaw = chartData.getAttribute('data-dates');
+            const countsRaw = chartData.getAttribute('data-counts');
+            if (datesRaw && datesRaw !== '[]') {
+                dates = JSON.parse(datesRaw.replace(/&quot;/g, '"'));
+            }
+            if (countsRaw && countsRaw !== '[]') {
+                counts = JSON.parse(countsRaw.replace(/&quot;/g, '"'));
+            }
+        } catch (e) {
+            console.error("Error parsing chart data:", e);
+        }
+        
+        // Get simple metrics
+        const purchaseCount = parseInt(chartData.getAttribute('data-purchase')) || 0;
+        const noPurchaseCount = parseInt(chartData.getAttribute('data-no-purchase')) || 0;
+        const auc = parseFloat(chartData.getAttribute('data-auc')) || 0;
+        const precision = parseFloat(chartData.getAttribute('data-precision')) || 0;
+        const recall = parseFloat(chartData.getAttribute('data-recall')) || 0;
+        const f1 = parseFloat(chartData.getAttribute('data-f1')) || 0;
+        
+        // Time series chart
+        new Chart(timeCtx, {
+            type: 'line',
+            data: {
+                labels: dates,
+                datasets: [{
+                    label: 'Number of Predictions',
+                    data: counts,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 2,
+                    tension: 0.2
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        
+        // Outcomes pie chart
+        new Chart(outcomeCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Will Purchase', 'No Purchase'],
+                datasets: [{
+                    data: [purchaseCount, noPurchaseCount],
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.7)',
+                        'rgba(201, 203, 207, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(201, 203, 207, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+        
+        // Metrics radar chart
+        new Chart(metricsCtx, {
+            type: 'radar',
+            data: {
+                labels: ['AUC', 'Precision', 'Recall', 'F1 Score'],
+                datasets: [{
+                    label: 'Model Metrics',
+                    data: [auc, precision, recall, f1],
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    r: {
+                        min: 0,
+                        max: 1,
+                        ticks: {
+                            stepSize: 0.2
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

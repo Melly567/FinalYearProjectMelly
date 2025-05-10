@@ -1,0 +1,159 @@
+{% extends 'myapp/base.html' %}
+
+{% block title %}Predict Purchase - Online Shopper Predictor{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <div class="card shadow">
+            <div class="card-body">
+                <h2 class="card-title mb-4">Make a Prediction</h2>
+                <p>Fill in the form below to predict whether a user will make a purchase.</p>
+                
+                <form method="post" id="prediction-form">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Administrative Metrics</h5>
+                            <div class="mb-3">
+                                <label for="administrative" class="form-label">Administrative Pages Visited</label>
+                                <input type="number" min="0" class="form-control" id="administrative" name="administrative" value="0" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="administrative_duration" class="form-label">Administrative Duration (seconds)</label>
+                                <input type="number" min="0" step="0.1" class="form-control" id="administrative_duration" name="administrative_duration" value="0" required>
+                            </div>
+                            
+                            <h5 class="mt-4">Informational Metrics</h5>
+                            <div class="mb-3">
+                                <label for="informational" class="form-label">Informational Pages Visited</label>
+                                <input type="number" min="0" class="form-control" id="informational" name="informational" value="0" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="informational_duration" class="form-label">Informational Duration (seconds)</label>
+                                <input type="number" min="0" step="0.1" class="form-control" id="informational_duration" name="informational_duration" value="0" required>
+                            </div>
+                            
+                            <h5 class="mt-4">Product Related Metrics</h5>
+                            <div class="mb-3">
+                                <label for="product_related" class="form-label">Product Related Pages Visited</label>
+                                <input type="number" min="0" class="form-control" id="product_related" name="product_related" value="0" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="product_related_duration" class="form-label">Product Related Duration (seconds)</label>
+                                <input type="number" min="0" step="0.1" class="form-control" id="product_related_duration" name="product_related_duration" value="0" required>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h5>Session Metrics</h5>
+                            <div class="mb-3">
+                                <label for="bounce_rate" class="form-label">Bounce Rate</label>
+                                <input type="number" min="0" max="1" step="0.01" class="form-control" id="bounce_rate" name="bounce_rate" value="0" required>
+                                <div class="form-text">Value between 0 and 1</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="exit_rate" class="form-label">Exit Rate</label>
+                                <input type="number" min="0" max="1" step="0.01" class="form-control" id="exit_rate" name="exit_rate" value="0" required>
+                                <div class="form-text">Value between 0 and 1</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="page_value" class="form-label">Page Value</label>
+                                <input type="number" min="0" step="0.01" class="form-control" id="page_value" name="page_value" value="0" required>
+                            </div>
+                            
+                            <h5 class="mt-4">Contextual Metrics</h5>
+                            <div class="mb-3">
+                                <label for="special_day" class="form-label">Special Day</label>
+                                <select class="form-select" id="special_day" name="special_day" required>
+                                    <option value="0">0 (Not special)</option>
+                                    <option value="0.2">0.2</option>
+                                    <option value="0.4">0.4</option>
+                                    <option value="0.6">0.6</option>
+                                    <option value="0.8">0.8</option>
+                                    <option value="1.0">1.0 (Very special)</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="month" class="form-label">Month</label>
+                                <select class="form-select" id="month" name="month" required>
+                                    {% for month in months %}
+                                    <option value="{{ month }}">{{ month }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="weekend" class="form-label">Weekend</label>
+                                <select class="form-select" id="weekend" name="weekend" required>
+                                    <option value="False">No</option>
+                                    <option value="True">Yes</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <h5>Technical Metrics</h5>
+                            <div class="mb-3">
+                                <label for="operating_systems" class="form-label">Operating System</label>
+                                <select class="form-select" id="operating_systems" name="operating_systems" required>
+                                    {% for i in "12345678" %}
+                                    <option value="{{ forloop.counter }}">System Type {{ forloop.counter }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="browser" class="form-label">Browser</label>
+                                <select class="form-select" id="browser" name="browser" required>
+                                    {% for i in "123456789" %}
+                                    <option value="{{ forloop.counter }}">Browser Type {{ forloop.counter }}</option>
+                                    {% endfor %}
+                                    <option value="10">Browser Type 10</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>User Metrics</h5>
+                            <div class="mb-3">
+                                <label for="region" class="form-label">Region</label>
+                                <select class="form-select" id="region" name="region" required>
+                                    {% for i in "123456789" %}
+                                    <option value="{{ forloop.counter }}">Region {{ forloop.counter }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="traffic_type" class="form-label">Traffic Type</label>
+                                <select class="form-select" id="traffic_type" name="traffic_type" required>
+                                    {% for i in "123456789" %}
+                                    <option value="{{ forloop.counter }}">Type {{ forloop.counter }}</option>
+                                    {% endfor %}
+                                    <option value="10">Type 10</option>
+                                    <option value="11">Type 11</option>
+                                    <option value="12">Type 12</option>
+                                    <option value="13">Type 13</option>
+                                    <option value="14">Type 14</option>
+                                    <option value="15">Type 15</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="visitor_type" class="form-label">Visitor Type</label>
+                                <select class="form-select" id="visitor_type" name="visitor_type" required>
+                                    {% for type in visitor_types %}
+                                    <option value="{{ type }}">{{ type|title }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">Make Prediction</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'myapp/base.html' %}
+
+{% block title %}Documentation - Online Shopper Predictor{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <div class="card shadow">
+            <div class="card-body">
+                <h2 class="card-title mb-4">Documentation</h2>
+
+                <div class="mb-4">
+                    <h3>About the Project</h3>
+                    <p>
+                        This Online Shopper Predictor uses machine learning to predict whether a user will make a purchase
+                        based on their browsing behavior and session information. The prediction model is trained on a dataset
+                        of online shopping sessions with various features.
+                    </p>
+                </div>
+
+                <div class="mb-4">
+                    <h3>How It Works</h3>
+                    <p>
+                        The application uses a Random Forest classifier trained on the Online Shopper Intention dataset.
+                        The model analyzes patterns in user behavior to predict purchase likelihood.
+                    </p>
+                    <h4>Key Features Used for Prediction:</h4>
+                    <ul>
+                        <li><strong>Administrative Pages:</strong> Number of administrative pages visited</li>
+                        <li><strong>Product Related Pages:</strong> Number of product-related pages visited</li>
+                        <li><strong>Session Duration:</strong> Time spent on different types of pages</li>
+                        <li><strong>Bounce Rate & Exit Rate:</strong> User engagement metrics</li>
+                        <li><strong>Special Day:</strong> Proximity to a special day (e.g., Valentine's day)</li>
+                        <li><strong>Visitor Type:</strong> New or returning visitor</li>
+                        <li><strong>Weekend:</strong> Whether the visit occurred during a weekend</li>
+                    </ul>
+                </div>
+
+                <div class="mb-4">
+                    <h3>Making Predictions</h3>
+                    <p>
+                        To make a prediction:
+                    </p>
+                    <ol>
+                        <li>Navigate to the "Make Prediction" page</li>
+                        <li>Fill in the browsing behavior details</li>
+                        <li>Click "Make Prediction" to see the result</li>
+                    </ol>
+                    <p>
+                        All predictions are saved and can be viewed in aggregate on the Dashboard.*
+
