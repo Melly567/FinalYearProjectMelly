@@ -1,0 +1,52 @@
+{% extends 'myapp/base.html' %}
+
+{% block title %}Bulk Prediction - Online Shopper Predictor{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card shadow mb-4">
+            <div class="card-body">
+                <h2 class="card-title mb-4">Bulk Prediction</h2>
+                <p>Upload a CSV file with shopper behavior data to make multiple predictions at once.</p>
+                
+                <div class="alert alert-info">
+                    <h5>CSV Format Requirements</h5>
+                    <p>Your CSV file should include the following column headers:</p>
+                    <ul class="mb-0">
+                        <li>Administrative, Administrative_Duration</li>
+                        <li>Informational, Informational_Duration</li>
+                        <li>ProductRelated, ProductRelated_Duration</li>
+                        <li>BounceRates, ExitRates, PageValues</li>
+                        <li>SpecialDay, Month (e.g., 'Feb', 'Mar')</li>
+                        <li>OperatingSystems, Browser, Region, TrafficType</li>
+                        <li>VisitorType (e.g., 'Returning_Visitor'), Weekend (True/False)</li>
+                    </ul>
+                </div>
+                
+                <form method="post" enctype="multipart/form-data" class="mt-4">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="csv_file" class="form-label">CSV File</label>
+                        <input type="file" class="form-control" id="csv_file" name="csv_file" accept=".csv" required>
+                    </div>
+                    
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary">Upload and Process</button>
+                        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+                
+                <div class="mt-4">
+                    <h5>Example CSV Format</h5>
+                    <pre class="bg-light p-3">
+Administrative,Administrative_Duration,Informational,Informational_Duration,ProductRelated,ProductRelated_Duration,BounceRates,ExitRates,PageValues,SpecialDay,Month,OperatingSystems,Browser,Region,TrafficType,VisitorType,Weekend
+0,0,0,0,15,346.5,0.2,0.2,0,0,Feb,1,1,1,1,Returning_Visitor,True
+3,87.83,0,0,27,798.33,0,0.013,22.92,0.8,Feb,2,2,3,1,Returning_Visitor,False
+4,73.5,2,120,36,998.74,0,0.0147,19.45,0.2,Feb,2,2,4,1,Returning_Visitor,False</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

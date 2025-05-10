@@ -1,0 +1,27 @@
+{% extends 'myapp/base.html' %}
+
+{% block title %}Home - Online Shopper Predictor{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto text-center">
+        <div class="card shadow mb-4">
+            <div class="card-body">
+                <h2 class="card-title mb-4">Welcome to Online Shopper Predictor</h2>
+                <p class="lead">
+                    This application predicts whether a user will make a purchase based on their browsing behavior.
+                </p>
+                
+                {% if user.is_authenticated %}
+                <div class="d-grid gap-2 d-md-block mt-4">
+                    <a href="{% url 'predict' %}" class="btn btn-primary">Make Prediction</a>
+                    <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">View Dashboard</a>
+                </div>
+                {% else %}
+                <p class="mt-4">Please <a href="{% url 'login' %}">log in</a> to make predictions and view the dashboard.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

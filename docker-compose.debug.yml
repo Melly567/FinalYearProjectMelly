@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 services:
   djangoversionproject:
     image: djangoversionproject
@@ -8,3 +9,15 @@ services:
     ports:
       - 8000:8000
       - 5678:5678
+=======
+services:
+  djangoversionproject:
+    image: djangoversionproject
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    command: ["sh", "-c", "pip install debugpy -t /tmp && python /tmp/debugpy --wait-for-client --listen 0.0.0.0:5678 manage.py runserver 0.0.0.0:8000 --nothreading --noreload"]
+    ports:
+      - 8000:8000
+      - 5678:5678
+>>>>>>> 2d5f4ea00d3443d5b05515e1c97230920c79bf22

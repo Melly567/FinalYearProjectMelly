@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 services:
   djangoversionproject:
     image: djangoversionproject
@@ -6,3 +7,13 @@ services:
       dockerfile: ./Dockerfile
     ports:
       - 8000:8000
+=======
+services:
+  djangoversionproject:
+    image: djangoversionproject
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - 8000:8000
+>>>>>>> 2d5f4ea00d3443d5b05515e1c97230920c79bf22
